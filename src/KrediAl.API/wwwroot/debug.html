@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug - API Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-2xl font-bold mb-6">API Debug Test</h1>
+        
+        <div class="space-y-4">
+            <button onclick="testAPI()" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+                API Test Et
+            </button>
+            
+            <button onclick="createTransaction()" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">
+                Yeni Transaction Oluştur
+            </button>
+            
+            <button onclick="testTransaction()" class="bg-purple-600 text-white px-6 py-2 rounded hover:bg-purple-700">
+                Transaction Detayları
+            </button>
+        </div>
+        
+        <div id="result" class="mt-6 p-4 bg-white rounded shadow font-mono text-sm whitespace-pre-wrap"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5800/api';
+        let currentTransactionId = null;
+        
+        function log(message) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent += new Date().toLocaleTimeString() + ': ' + message + '\n';
+        }
+        
+        function clear() {
+            document.getElementById('result').textContent = '';
+        }
+        
+        async function testAPI() {
+            clear();
+            log('API test ediliyor...');
+            
+            try {
+                const response = await fetch(API_BASE + '/marketplace/create-session', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        mpUser: "demo_mp",
+                        mpPassword: "demo123",
+                        order: {
+                            successUrl: "https://marketplace.com/success",
+                            rejectUrl: "https://marketplace.com/reject",
+                            orderId: "DEBUG-" + Date.now(),
+                            totalAmount: 15000,
+                            items: [{
+                                category: "debug ürün",
+                                unitPrice: 15000,
+                                tax: 20
+                            }]
+                        }
+                    })
+                });
+                
+                log('Response status: ' + response.status);
+                const data = await response.json();
+                log('Response data: ' + JSON.stringify(data, null, 2));
+                
+                if (response.ok) {
+                    currentTransactionId = data.data.transactionId;
+                    log('✅ Transaction oluşturuldu: ' + currentTransactionId);
+                    log('🔗 Redirect URL: ' + data.data.redirectUrl);
+                } else {
+                    log('❌ Hata: ' + data.message);
+                }
+            } catch (error) {
+                log('❌ Network hatası: ' + error.message);
+            }
+        }
+        
+        async function createTransaction() {
+            await testAPI();
+        }
+        
+        async function testTransaction() {
+            if (!currentTransactionId) {
+                log('⚠️ Önce transaction oluşturun');
+                return;
+            }
+            
+            clear();
+            log('Transaction detayları alınıyor...');
+            log('Transaction ID: ' + currentTransactionId);
+            
+            try {
+                const response = await fetch(API_BASE + '/transaction/' + currentTransactionId);
+                log('Response status: ' + response.status);
+                
+                const data = await response.json();
+                log('Response data: ' + JSON.stringify(data, null, 2));
+                
+                if (response.ok) {
+                    log('✅ Transaction detayları alındı');
+                } else {
+                    log('❌ Hata: ' + data.message);
+                }
+            } catch (error) {
+                log('❌ Network hatası: ' + error.message);
+            }
+        }
+        
+        // Sayfa yüklendiğinde API'yi test et
+        window.addEventListener('load', () => {
+            log('Debug sayfası yüklendi');
+            log('API Base: ' + API_BASE);
+        });
+    </script>
+</body>
+</html>

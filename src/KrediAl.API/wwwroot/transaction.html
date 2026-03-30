@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kredi Başvurusu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .step { display: none; }
+        .step.active { display: block; }
+        .loading { display: none; }
+        .loading.show { display: block; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <!-- Header -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h1 class="text-2xl font-bold text-blue-600">Kredi Al - Başvuru Süreci</h1>
+            <p class="text-gray-600 mt-2">Kredi başvurunuzu adım adım tamamlayın</p>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex justify-between mb-4">
+                <div class="step-indicator" data-step="1">
+                    <div class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center">1</div>
+                    <span class="text-sm mt-1">Sipariş Onayı</span>
+                </div>
+                <div class="step-indicator" data-step="2">
+                    <div class="w-8 h-8 bg-gray-300 text-white rounded-full flex items-center justify-center">2</div>
+                    <span class="text-sm mt-1">Giriş/Kayıt</span>
+                </div>
+                <div class="step-indicator" data-step="3">
+                    <div class="w-8 h-8 bg-gray-300 text-white rounded-full flex items-center justify-center">3</div>
+                    <span class="text-sm mt-1">Findeks Onayı</span>
+                </div>
+                <div class="step-indicator" data-step="4">
+                    <div class="w-8 h-8 bg-gray-300 text-white rounded-full flex items-center justify-center">4</div>
+                    <span class="text-sm mt-1">Banka Seçimi</span>
+                </div>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+                <div id="progressBar" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 25%"></div>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div id="loading" class="loading">
+            <div class="bg-white rounded-lg shadow-md p-8 text-center">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <p class="text-gray-600">İşlem yapılıyor...</p>
+            </div>
+        </div>
+
+        <!-- Step 1: Order Confirmation -->
+        <div id="step1" class="step active bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold mb-4">Sipariş Detayları</h2>
+            <div id="orderDetails" class="space-y-3">
+                <!-- Order details will be loaded here -->
+            </div>
+            <div class="mt-6">
+                <button onclick="confirmOrder()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                    Siparişi Onayla
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 2: Login/Register -->
+        <div id="step2" class="step bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold mb-4">Hesabınıza Giriş Yapın</h2>
+            
+            <!-- Login Form -->
+            <div id="loginForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" id="loginEmail" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Şifre</label>
+                    <input type="password" id="loginPassword" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                </div>
+                <button onclick="login()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                    Giriş Yap
+                </button>
+                <button onclick="showRegisterForm()" class="ml-4 text-blue-600 hover:underline">
+                    Hesabım yok
+                </button>
+            </div>
+
+            <!-- Register Form -->
+            <div id="registerForm" class="space-y-4" style="display: none;">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" id="registerEmail" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Şifre</label>
+                    <input type="password" id="registerPassword" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Ad</label>
+                    <input type="text" id="registerFirstName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Soyad</label>
+                    <input type="text" id="registerLastName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Telefon</label>
+                    <input type="tel" id="registerPhone" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">TC Kimlik No</label>
+                    <input type="text" id="registerNationalId" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                </div>
+                <button onclick="register()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                    Kayıt Ol
+                </button>
+                <button onclick="showLoginForm()" class="ml-4 text-blue-600 hover:underline">
+                    Zaten hesabım var
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 3: Findeks Approval -->
+        <div id="step3" class="step bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold mb-4">Findeks Onayı</h2>
+            <p class="text-gray-600 mb-4">Kredi notunuzu kontrol etmek için Findeks onayı gereklidir.</p>
+            <button onclick="requestFindeks()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                Findeks Onayı Al
+            </button>
+        </div>
+
+        <!-- Step 4: Bank Offers -->
+        <div id="step4" class="step bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold mb-4">Banka Teklifleri</h2>
+            <div id="bankOffers" class="space-y-4">
+                <!-- Bank offers will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Messages -->
+        <div id="message" class="hidden mt-4 p-4 rounded-lg"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5800/api';
+        let transactionId = null;
+        let authToken = null;
+
+        // Get transaction ID from URL
+        function getTransactionId() {
+            // Hash fragment'tan al (örn: #transaction-id)
+            const hash = window.location.hash.substring(1); // # işaretini kaldır
+            if (hash) {
+                return hash;
+            }
+            
+            // Path'ten al (örn: /transaction/transaction-id)
+            const path = window.location.pathname;
+            const parts = path.split('/');
+            return parts[parts.length - 1];
+        }
+
+        // Show loading
+        function showLoading() {
+            document.getElementById('loading').classList.add('show');
+            hideMessage();
+        }
+
+        // Hide loading
+        function hideLoading() {
+            document.getElementById('loading').classList.remove('show');
+        }
+
+        // Show message
+        function showMessage(text, type = 'info') {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.className = `mt-4 p-4 rounded-lg ${type === 'error' ? 'bg-red-100 text-red-700' : type === 'success' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`;
+            messageEl.classList.remove('hidden');
+        }
+
+        // Hide message
+        function hideMessage() {
+            document.getElementById('message').classList.add('hidden');
+        }
+
+        // Switch step
+        function switchStep(stepNumber) {
+            document.querySelectorAll('.step').forEach(step => step.classList.remove('active'));
+            document.getElementById(`step${stepNumber}`).classList.add('active');
+            
+            // Update progress bar
+            const progress = (stepNumber / 4) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            
+            // Update step indicators
+            document.querySelectorAll('.step-indicator').forEach((indicator, index) => {
+                const circle = indicator.querySelector('div');
+                if (index < stepNumber) {
+                    circle.className = 'w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center';
+                } else {
+                    circle.className = 'w-8 h-8 bg-gray-300 text-white rounded-full flex items-center justify-center';
+                }
+            });
+        }
+
+        // Load transaction details
+        async function loadTransaction() {
+            try {
+                showLoading();
+                const response = await fetch(`${API_BASE}/transaction/${transactionId}`);
+                const data = await response.json();
+                
+                console.log('Transaction response:', data);
+                
+                if (response.ok) {
+                    if (data.success && data.data) {
+                        displayOrderDetails(data.data);
+                    } else {
+                        showMessage('Transaction verisi bulunamadı', 'error');
+                    }
+                } else {
+                    showMessage(data.message || 'Transaction bulunamadı', 'error');
+                }
+            } catch (error) {
+                console.error('Load transaction error:', error);
+                showMessage('Bir hata oluştu: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Display order details
+        function displayOrderDetails(transaction) {
+            console.log('Displaying transaction:', transaction);
+            
+            const orderDetails = document.getElementById('orderDetails');
+            
+            // Items'ı güvenli şekilde al
+            const items = transaction.items || [];
+            console.log('Items:', items);
+            
+            orderDetails.innerHTML = `
+                <div class="border rounded p-4">
+                    <h3 class="font-semibold mb-2">Sipariş Bilgileri</h3>
+                    <p><strong>Sipariş No:</strong> ${transaction.orderId || 'N/A'}</p>
+                    <p><strong>Toplam Tutar:</strong> ₺${transaction.totalAmount ? transaction.totalAmount.toLocaleString() : '0'}</p>
+                    <div class="mt-3">
+                        <h4 class="font-semibold">Ürünler:</h4>
+                        ${items.length > 0 ? items.map(item => `
+                            <div class="ml-4 mt-2">
+                                <p>• ${item.category} - ₺${item.unitPrice ? item.unitPrice.toLocaleString() : '0'}</p>
+                            </div>
+                        `).join('') : '<p class="text-gray-500">Ürün bulunmuyor</p>'}
+                    </div>
+                    <p class="mt-3 text-sm text-gray-600"><strong>Durum:</strong> ${transaction.status || 'Bilinmiyor'}</p>
+                    <p class="mt-1 text-sm text-gray-600"><strong>Devam Edebilir:</strong> ${transaction.canContinue ? 'Evet' : 'Hayır'}</p>
+                </div>
+            `;
+        }
+
+        // Confirm order
+        async function confirmOrder() {
+            try {
+                showLoading();
+                const response = await fetch(`${API_BASE}/transaction/${transactionId}/confirm-order`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                if (response.ok) {
+                    switchStep(2);
+                    showMessage('Sipariş onaylandı. Lütfen giriş yapın.', 'success');
+                } else {
+                    showMessage('Sipariş onaylanamadı', 'error');
+                }
+            } catch (error) {
+                showMessage('Bir hata oluştu', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Show register form
+        function showRegisterForm() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+        }
+
+        // Show login form
+        function showLoginForm() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+        }
+
+        // Login
+        async function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!email || !password) {
+                showMessage('Email ve şifre gereklidir', 'error');
+                return;
+            }
+            
+            try {
+                showLoading();
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    authToken = data.data.token;
+                    await linkUser();
+                } else {
+                    showMessage(data.message || 'Giriş başarısız', 'error');
+                }
+            } catch (error) {
+                showMessage('Bir hata oluştu', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Register
+        async function register() {
+            const userData = {
+                email: document.getElementById('registerEmail').value,
+                password: document.getElementById('registerPassword').value,
+                firstName: document.getElementById('registerFirstName').value,
+                lastName: document.getElementById('registerLastName').value,
+                phoneNumber: document.getElementById('registerPhone').value,
+                nationalId: document.getElementById('registerNationalId').value
+            };
+            
+            if (!userData.email || !userData.password) {
+                showMessage('Email ve şifre gereklidir', 'error');
+                return;
+            }
+            
+            try {
+                showLoading();
+                const response = await fetch(`${API_BASE}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    authToken = data.data.token;
+                    await linkUser();
+                } else {
+                    showMessage(data.message || 'Kayıt başarısız', 'error');
+                }
+            } catch (error) {
+                showMessage('Bir hata oluştu', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Link user to transaction
+        async function linkUser() {
+            try {
+                showLoading();
+                const response = await fetch(`${API_BASE}/transaction/${transactionId}/link-user`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    await continueTransaction();
+                } else {
+                    showMessage('Kullanıcı bağlanamadı', 'error');
+                }
+            } catch (error) {
+                showMessage('Bir hata oluştu', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Continue transaction
+        async function continueTransaction() {
+            try {
+                showLoading();
+                const response = await fetch(`${API_BASE}/transaction/${transactionId}/continue`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    if (data.data.requiresFindeks) {
+                        switchStep(3);
+                        showMessage('Findeks onayı gereklidir', 'info');
+                    } else {
+                        await loadBankOffers();
+                    }
+                } else {
+                    showMessage('İşlem devam edilemedi', 'error');
+                }
+            } catch (error) {
+                showMessage('Bir hata oluştu', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Request Findeks
+        async function requestFindeks() {
+            try {
+                showLoading();
+                const response = await fetch(`${API_BASE}/transaction/${transactionId}/request-findeks`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    await loadBankOffers();
+                } else {
+                    showMessage('Findeks onayı alınamadı', 'error');
+                }
+            } catch (error) {
+                showMessage('Bir hata oluştu', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Load bank offers
+        async function loadBankOffers() {
+            try {
+                showLoading();
+                const response = await fetch(`${API_BASE}/transaction/${transactionId}/bank-offers`, {
+                    headers: { 
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    displayBankOffers(data.data);
+                    switchStep(4);
+                } else {
+                    showMessage('Banka teklifleri alınamadı', 'error');
+                }
+            } catch (error) {
+                showMessage('Bir hata oluştu', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Display bank offers
+        function displayBankOffers(offers) {
+            const bankOffersDiv = document.getElementById('bankOffers');
+            
+            if (!offers || offers.length === 0) {
+                bankOffersDiv.innerHTML = '<p class="text-gray-600">Henüz banka teklifi bulunmuyor.</p>';
+                return;
+            }
+            
+            bankOffersDiv.innerHTML = offers.map(offer => `
+                <div class="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-semibold text-lg">${offer.bankName}</h3>
+                            <p class="text-gray-600">Faiz Oranı: %${offer.interestRate}</p>
+                            <p class="text-gray-600">Aylık Ödeme: ₺${offer.monthlyPayment?.toLocaleString() || 'Hesaplanıyor...'}</p>
+                            <p class="text-gray-600">Toplam Geri Ödeme: ₺${offer.totalRepayment?.toLocaleString() || 'Hesaplanıyor...'}</p>
+                        </div>
+                        <button onclick="selectOffer('${offer.id}')" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                            Bu Teklifi Seç
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Select bank offer
+        async function selectOffer(offerId) {
+            try {
+                showLoading();
+                const response = await fetch(`${API_BASE}/transaction/${transactionId}/select-offer/${offerId}`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showMessage('Banka teklifi seçildi! Bankaya yönlendiriliyorsunuz...', 'success');
+                    setTimeout(() => {
+                        window.location.href = data.data.redirectUrl || '#';
+                    }, 2000);
+                } else {
+                    showMessage('Banka teklifi seçilemedi', 'error');
+                }
+            } catch (error) {
+                showMessage('Bir hata oluştu', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            transactionId = getTransactionId();
+            
+            console.log('Transaction ID:', transactionId);
+            
+            if (!transactionId) {
+                showMessage('Transaction ID bulunamadı', 'error');
+                return;
+            }
+            
+            await loadTransaction();
+        });
+    </script>
+</body>
+</html>

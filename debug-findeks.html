@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Findeks Debug</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 p-8">
+    <div class="max-w-2xl mx-auto">
+        <h1 class="text-2xl font-bold mb-6">Findeks Debug Test</h1>
+        
+        <div class="space-y-4">
+            <button onclick="createNewTransaction()" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+                Yeni Transaction Oluştur
+            </button>
+            
+            <button onclick="testCurrentTransaction()" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">
+                Mevcut Transaction Test Et
+            </button>
+        </div>
+        
+        <div id="result" class="mt-6 p-4 bg-white rounded shadow font-mono text-sm whitespace-pre-wrap"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5800/api';
+        let currentTransactionId = 'b05a6360-391c-4e19-ad1e-1abb55aa90b4';
+        let authToken = null;
+        
+        function log(message) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent += new Date().toLocaleTimeString() + ': ' + message + '\n';
+        }
+        
+        function clear() {
+            document.getElementById('result').textContent = '';
+        }
+        
+        async function createNewTransaction() {
+            clear();
+            log('Yeni transaction oluşturuluyor...');
+            
+            try {
+                const response = await fetch(API_BASE + '/marketplace/create-session', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        mpUser: "demo_mp",
+                        mpPassword: "demo123",
+                        order: {
+                            successUrl: "https://marketplace.com/success",
+                            rejectUrl: "https://marketplace.com/reject",
+                            orderId: "DEBUG-" + Date.now(),
+                            totalAmount: 15000,
+                            items: [{
+                                category: "debug ürün",
+                                unitPrice: 15000,
+                                tax: 20
+                            }]
+                        }
+                    })
+                });
+                
+                const data = await response.json();
+                log('Response: ' + JSON.stringify(data, null, 2));
+                
+                if (response.ok) {
+                    currentTransactionId = data.data.transactionId;
+                    log('✅ Yeni Transaction ID: ' + currentTransactionId);
+                    await testTransactionFlow();
+                } else {
+                    log('❌ Hata: ' + data.message);
+                }
+            } catch (error) {
+                log('❌ Network hatası: ' + error.message);
+            }
+        }
+        
+        async function testCurrentTransaction() {
+            clear();
+            log('Mevcut transaction test ediliyor: ' + currentTransactionId);
+            await testTransactionFlow();
+        }
+        
+        async function testTransactionFlow() {
+            try {
+                // 1. Giriş yap
+                log('1. Giriş yapılıyor...');
+                const loginResponse = await fetch(API_BASE + '/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: "test@example.com",
+                        password: "Test123!"
+                    })
+                });
+                
+                const loginData = await loginResponse.json();
+                log('Login Response: ' + JSON.stringify(loginData, null, 2));
+                
+                if (loginResponse.ok) {
+                    authToken = loginData.data.token;
+                    log('✅ Giriş başarılı');
+                } else {
+                    log('❌ Giriş başarısız: ' + loginData.message);
+                    return;
+                }
+                
+                // 2. Transaction detayları
+                log('2. Transaction detayları alınıyor...');
+                const txResponse = await fetch(API_BASE + '/transaction/' + currentTransactionId, {
+                    headers: { 'Authorization': 'Bearer ' + authToken }
+                });
+                
+                const txData = await txResponse.json();
+                log('Transaction Response: ' + JSON.stringify(txData, null, 2));
+                
+                if (txResponse.ok) {
+                    log('✅ Transaction detayları alındı');
+                    log('Status: ' + txData.data.status);
+                    log('User ID: ' + txData.data.userId);
+                } else {
+                    log('❌ Transaction detayları alınamadı: ' + txData.message);
+                    return;
+                }
+                
+                // 3. Sipariş onayı
+                log('3. Sipariş onaylanıyor...');
+                const confirmResponse = await fetch(API_BASE + '/transaction/' + currentTransactionId + '/confirm-order', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + authToken }
+                });
+                
+                const confirmData = await confirmResponse.json();
+                log('Confirm Response: ' + JSON.stringify(confirmData, null, 2));
+                
+                // 4. User bağlama
+                log('4. Kullanıcı bağlanıyor...');
+                const linkResponse = await fetch(API_BASE + '/transaction/' + currentTransactionId + '/link-user', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + authToken }
+                });
+                
+                const linkData = await linkResponse.json();
+                log('Link Response: ' + JSON.stringify(linkData, null, 2));
+                
+                // 5. Findeks onayı
+                log('5. Findeks onayı alınıyor...');
+                const findeksResponse = await fetch(API_BASE + '/transaction/' + currentTransactionId + '/request-findeks', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + authToken }
+                });
+                
+                const findeksData = await findeksResponse.json();
+                log('Findeks Response: ' + JSON.stringify(findeksData, null, 2));
+                
+                if (findeksResponse.ok) {
+                    log('✅ Findeks onayı başarılı!');
+                } else {
+                    log('❌ Findeks onayı başarısız: ' + findeksData.message);
+                }
+                
+            } catch (error) {
+                log('❌ Hata: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
