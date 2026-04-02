@@ -6,7 +6,7 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace KrediAl.API.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/[controller]/[action]")]
 [Produces("application/json")]
 [SwaggerTag("Authentication")]
 public class AuthController : ControllerBase

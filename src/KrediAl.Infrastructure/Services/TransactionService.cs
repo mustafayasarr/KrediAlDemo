@@ -353,4 +353,162 @@ public class TransactionService : ITransactionService
 
         return true;
     }
+
+    public async Task<OrderSummaryDto> GetOrderSummaryAsync(Guid transactionId)
+    {
+        var transaction = await _context.Transactions
+            .Include(t => t.OrderItems)
+            .Include(t => t.Marketplace)
+            .FirstOrDefaultAsync(t => t.Id == transactionId);
+
+        if (transaction == null)
+        {
+            throw new InvalidOperationException("Transaction not found");
+        }
+
+        var commissionRate = 0.03m; // %3
+        var commissionAmount = transaction.TotalAmount * commissionRate;
+        var daysToExpire = transaction.ExpiresAt.HasValue 
+            ? (int)(transaction.ExpiresAt.Value - DateTime.UtcNow).TotalDays 
+            : 0;
+
+        return new OrderSummaryDto
+        {
+            TransactionId = transaction.Id,
+            OrderId = transaction.OrderId,
+            TotalAmount = transaction.TotalAmount,
+            CommissionAmount = commissionAmount,
+            CommissionRate = commissionRate,
+            Items = transaction.OrderItems.Select(item => new OrderItemDto
+            {
+                Category = item.Category,
+                UnitPrice = item.UnitPrice,
+                Tax = item.Tax,
+                Quantity = item.Quantity
+            }).ToList(),
+            MarketplaceName = transaction.Marketplace.Name,
+            CreatedAt = transaction.CreatedAt,
+            ExpiresAt = transaction.ExpiresAt,
+            DaysToExpire = daysToExpire > 0 ? daysToExpire : 0
+        };
+    }
+
+    public async Task<bool> CancelTransactionWithReasonAsync(Guid transactionId, Guid userId, CancelTransactionRequest request)
+    {
+        var transaction = await _context.Transactions
+            .Include(t => t.Payment)
+            .FirstOrDefaultAsync(t => t.Id == transactionId && t.UserId == userId);
+
+        if (transaction == null)
+        {
+            throw new InvalidOperationException("Transaction not found or unauthorized");
+        }
+
+        if (transaction.Status == TransactionStatus.Completed || transaction.Status == TransactionStatus.Cancelled)
+        {
+            throw new InvalidOperationException("Transaction cannot be cancelled");
+        }
+
+        // Komisyon ödenmişse iade işlemi başlat
+        if (transaction.Payment != null && transaction.Payment.Status == PaymentStatus.Completed)
+        {
+            await _paymentService.RefundCommissionAsync(transactionId);
+        }
+
+        transaction.Status = TransactionStatus.Cancelled;
+        transaction.UpdatedAt = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+
+        // Pazaryerine iptal bildirimi gönder
+        await _marketplaceService.NotifyCancellationAsync(transactionId, request.CancelReason);
+
+        return true;
+    }
+
+    public async Task<ContinueOptionDto> GetContinueOptionAsync(Guid transactionId, Guid userId)
+    {
+        var transaction = await _context.Transactions
+            .Include(t => t.Payment)
+            .FirstOrDefaultAsync(t => t.Id == transactionId && t.UserId == userId);
+
+        if (transaction == null)
+        {
+            throw new InvalidOperationException("Transaction not found or unauthorized");
+        }
+
+        var commissionPaid = transaction.Payment != null && transaction.Payment.Status == PaymentStatus.Completed;
+        var isExpired = transaction.IsExpired;
+        var daysRemaining = transaction.ExpiresAt.HasValue 
+            ? (int)(transaction.ExpiresAt.Value - DateTime.UtcNow).TotalDays 
+            : 0;
+
+        // 3 gün içinde geri dönme kontrolü
+        var canContinue = commissionPaid && !isExpired && daysRemaining > 0;
+
+        var message = canContinue 
+            ? $"İşleminize devam edebilirsiniz. {daysRemaining} gün süreniz kaldı."
+            : isExpired 
+                ? "İşlem süresi dolmuştur. Yeni bir başvuru yapmanız gerekmektedir."
+                : !commissionPaid 
+                    ? "Devam etmek için komisyon ödemesi yapmanız gerekmektedir."
+                    : "İşleminize devam edilemiyor.";
+
+        return new ContinueOptionDto
+        {
+            CanContinue = canContinue,
+            Message = message,
+            DaysRemaining = daysRemaining > 0 ? daysRemaining : 0,
+            CommissionPaid = commissionPaid,
+            CommissionAmount = transaction.Payment?.Amount,
+            IsExpired = isExpired,
+            ExpiresAt = transaction.ExpiresAt,
+            CurrentStatus = transaction.Status.ToString()
+        };
+    }
+
+    public async Task<RefundCommissionResponse> RefundCommissionAsync(Guid transactionId, Guid userId)
+    {
+        var transaction = await _context.Transactions
+            .Include(t => t.Payment)
+            .FirstOrDefaultAsync(t => t.Id == transactionId && t.UserId == userId);
+
+        if (transaction == null)
+        {
+            throw new InvalidOperationException("Transaction not found or unauthorized");
+        }
+
+        if (transaction.Payment == null || transaction.Payment.Status != PaymentStatus.Completed)
+        {
+            throw new InvalidOperationException("No commission payment found to refund");
+        }
+
+        if (transaction.Payment.Status == PaymentStatus.Refunded)
+        {
+            throw new InvalidOperationException("Commission already refunded");
+        }
+
+        var refundSuccess = await _paymentService.RefundCommissionAsync(transactionId);
+        
+        if (!refundSuccess)
+        {
+            return new RefundCommissionResponse
+            {
+                Success = false,
+                Message = "Komisyon iadesi başarısız oldu"
+            };
+        }
+
+        transaction.Payment.Status = PaymentStatus.Refunded;
+        transaction.Payment.RefundDate = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+
+        return new RefundCommissionResponse
+        {
+            Success = true,
+            RefundAmount = transaction.Payment.Amount,
+            RefundReference = $"REF-{Guid.NewGuid().ToString().Substring(0, 8).ToUpper()}",
+            RefundDate = DateTime.UtcNow,
+            Message = "Komisyon başarıyla iade edildi"
+        };
+    }
 }

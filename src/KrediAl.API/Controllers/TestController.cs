@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace KrediAl.API.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/[controller]/[action]")]
 public class TestController : ControllerBase
 {
     private readonly KrediAlDbContext _context;

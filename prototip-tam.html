@@ -1,0 +1,1823 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kredi Al - Tam Prototip</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #2563EB;
+            --primary-blue-dark: #1E40AF;
+            --primary-blue-light: #DBEAFE;
+            --secondary-green: #10B981;
+            --secondary-red: #EF4444;
+            --secondary-yellow: #F59E0B;
+            --gray-50: #F9FAFB;
+            --gray-100: #F3F4F6;
+            --gray-200: #E5E7EB;
+            --gray-300: #D1D5DB;
+            --gray-500: #6B7280;
+            --gray-700: #374151;
+            --gray-900: #111827;
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--gray-900);
+            background: var(--gray-50);
+        }
+
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0 80px;
+        }
+
+        /* Header */
+        .header {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 80px;
+            background: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .logo {
+            font-family: 'Poppins', sans-serif;
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--primary-blue);
+            text-decoration: none;
+        }
+
+        .nav {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: var(--gray-700);
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav a:hover {
+            color: var(--primary-blue);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .btn-primary {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-blue-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-blue);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-blue-light);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--gray-700);
+        }
+
+        .btn-ghost:hover {
+            background: var(--gray-100);
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--gray-300);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-input.error {
+            border-color: var(--secondary-red);
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        /* Progress */
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 48px;
+            max-width: 400px;
+        }
+
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+
+        .step::before {
+            content: "";
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--gray-300);
+            display: block;
+            margin: 0 auto 8px;
+            font-size: 14px;
+            line-height: 32px;
+            color: white;
+            font-weight: 600;
+        }
+
+        .step.active::before {
+            background: var(--primary-blue);
+        }
+
+        .step.completed::before {
+            background: var(--secondary-green);
+            content: "✓";
+        }
+
+        /* Screen Navigation */
+        .screen-nav {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+        }
+
+        .screen-nav h3 {
+            font-size: 14px;
+            margin-bottom: 12px;
+            color: var(--gray-700);
+        }
+
+        .screen-nav ul {
+            list-style: none;
+        }
+
+        .screen-nav li {
+            margin-bottom: 8px;
+        }
+
+        .screen-nav a {
+            display: block;
+            padding: 8px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            color: var(--gray-700);
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .screen-nav a:hover,
+        .screen-nav a.active {
+            background: var(--primary-blue-light);
+            color: var(--primary-blue);
+        }
+
+        /* Screen Sections */
+        .screen {
+            display: none;
+            min-height: 100vh;
+            padding-top: 80px;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* Landing Page Styles */
+        .hero {
+            padding: 80px 0;
+            background: linear-gradient(135deg, var(--primary-blue-light) 0%, white 100%);
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .hero-text h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 24px;
+            line-height: 1.2;
+        }
+
+        .hero-text p {
+            font-size: 20px;
+            color: var(--gray-700);
+            margin-bottom: 32px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+        }
+
+        .hero-image {
+            background: white;
+            border-radius: 24px;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-xl);
+            font-size: 64px;
+        }
+
+        .features {
+            padding: 80px 0;
+            background: white;
+        }
+
+        .features h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 36px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+
+        .feature-card {
+            padding: 32px;
+            border-radius: 16px;
+            background: white;
+            box-shadow: var(--shadow-md);
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .feature-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .feature-card h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            color: var(--gray-700);
+        }
+
+        .banks {
+            padding: 80px 0;
+            background: var(--gray-50);
+        }
+
+        .banks h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 36px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .banks-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+        }
+
+        .bank-card {
+            padding: 24px;
+            border-radius: 16px;
+            background: white;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s;
+        }
+
+        .bank-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .bank-logo {
+            height: 60px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .bank-card h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .bank-card ul {
+            list-style: none;
+            margin-bottom: 16px;
+        }
+
+        .bank-card li {
+            padding: 4px 0;
+            color: var(--gray-700);
+        }
+
+        /* Order Confirmation */
+        .order-confirmation {
+            padding: 80px 0;
+            min-height: calc(100vh - 80px);
+            display: flex;
+            align-items: center;
+        }
+
+        .order-card {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .order-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .order-header h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 36px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .product-details {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .product-image {
+            width: 120px;
+            height: 120px;
+            border-radius: 12px;
+            background: var(--gray-100);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+        }
+
+        .product-info h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .product-info p {
+            color: var(--gray-700);
+            margin-bottom: 8px;
+        }
+
+        .price-breakdown {
+            border-top: 1px solid var(--gray-200);
+            padding-top: 16px;
+            margin-bottom: 24px;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .price-row.total {
+            font-weight: 600;
+            font-size: 18px;
+            border-top: 1px solid var(--gray-200);
+            padding-top: 8px;
+            margin-top: 8px;
+        }
+
+        .timer-badge {
+            background: var(--secondary-yellow);
+            color: var(--gray-900);
+            padding: 8px 16px;
+            border-radius: 24px;
+            text-align: center;
+            margin-bottom: 24px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .checkbox-group {
+            margin-bottom: 24px;
+        }
+
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Login Screen */
+        .login-screen {
+            padding: 80px 0;
+            min-height: calc(100vh - 80px);
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, var(--primary-blue-light) 0%, white 100%);
+        }
+
+        .login-card {
+            max-width: 480px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .login-header {
+            margin-bottom: 40px;
+        }
+
+        .login-header .icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .login-header h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 36px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .login-header p {
+            color: var(--gray-700);
+        }
+
+        .social-login {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .social-login .btn {
+            flex: 1;
+        }
+
+        .divider {
+            margin: 24px 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .divider::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--gray-300);
+        }
+
+        .divider span {
+            background: white;
+            padding: 0 16px;
+            position: relative;
+            color: var(--gray-700);
+        }
+
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .remember-forgot a {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .remember-forgot a:hover {
+            text-decoration: underline;
+        }
+
+        /* Findeks Approval */
+        .findeks-screen {
+            padding: 80px 0;
+            min-height: calc(100vh - 80px);
+        }
+
+        .findeks-content {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .findeks-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .findeks-header h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 36px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .info-list {
+            list-style: none;
+            margin-bottom: 24px;
+        }
+
+        .info-list li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+        }
+
+        .info-list li::before {
+            content: "✓";
+            color: var(--secondary-green);
+            font-weight: bold;
+        }
+
+        .required-info {
+            background: var(--gray-50);
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        .required-info h3 {
+            margin-bottom: 16px;
+        }
+
+        .required-info ul {
+            list-style: none;
+        }
+
+        .required-info li {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+        }
+
+        .required-info .status {
+            color: var(--secondary-green);
+            font-weight: 500;
+        }
+
+        /* Bank Offers */
+        .bank-offers-screen {
+            padding: 80px 0;
+            min-height: calc(100vh - 80px);
+        }
+
+        .offers-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .offers-header h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 36px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .amount-display {
+            font-size: 20px;
+            color: var(--gray-700);
+            margin-bottom: 32px;
+        }
+
+        .filters {
+            background: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            margin-bottom: 32px;
+            display: flex;
+            gap: 16px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid var(--gray-300);
+            border-radius: 6px;
+            background: white;
+        }
+
+        .offers-grid {
+            display: grid;
+            gap: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .offer-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .offer-card.recommended {
+            border-color: var(--primary-blue);
+            position: relative;
+        }
+
+        .offer-card.recommended::before {
+            content: "⭐ Önerilen";
+            position: absolute;
+            top: -12px;
+            right: 24px;
+            background: var(--primary-blue);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 24px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .offer-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .offer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .bank-name {
+            font-family: 'Poppins', sans-serif;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .offer-details {
+            margin-bottom: 16px;
+        }
+
+        .offer-details p {
+            margin-bottom: 8px;
+            color: var(--gray-700);
+        }
+
+        .offer-price {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .offer-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .offer-actions .btn {
+            flex: 1;
+        }
+
+        /* Payment Screen */
+        .payment-screen {
+            padding: 80px 0;
+            min-height: calc(100vh - 80px);
+        }
+
+        .payment-content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .payment-main {
+            max-width: 600px;
+        }
+
+        .payment-header h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 36px;
+            font-weight: 600;
+            margin-bottom: 32px;
+        }
+
+        .commission-card {
+            background: var(--primary-blue);
+            color: white;
+            padding: 32px;
+            border-radius: 16px;
+            margin-bottom: 32px;
+        }
+
+        .commission-card h2 {
+            margin-bottom: 24px;
+        }
+
+        .commission-breakdown {
+            margin-bottom: 24px;
+        }
+
+        .commission-breakdown .price-row {
+            color: white;
+            opacity: 0.9;
+        }
+
+        .commission-breakdown .price-row.total {
+            font-size: 24px;
+            opacity: 1;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .payment-methods {
+            margin-bottom: 32px;
+        }
+
+        .payment-methods h3 {
+            margin-bottom: 16px;
+        }
+
+        .radio-group {
+            margin-bottom: 16px;
+        }
+
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            padding: 12px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .radio-group label:hover {
+            background: var(--gray-50);
+        }
+
+        .radio-group input[type="radio"] {
+            width: 20px;
+            height: 20px;
+        }
+
+        .payment-summary {
+            position: sticky;
+            top: 100px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .summary-card h3 {
+            margin-bottom: 16px;
+        }
+
+        /* Success Screen */
+        .success-screen {
+            padding: 80px 0;
+            min-height: calc(100vh - 80px);
+            display: flex;
+            align-items: center;
+        }
+
+        .success-content {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .success-icon {
+            font-size: 80px;
+            margin-bottom: 32px;
+            animation: successPulse 0.6s ease-out;
+        }
+
+        @keyframes successPulse {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .success-header h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--secondary-green);
+        }
+
+        .success-header p {
+            font-size: 20px;
+            color: var(--gray-700);
+            margin-bottom: 40px;
+        }
+
+        .transaction-details {
+            background: white;
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 32px;
+            text-align: left;
+        }
+
+        .transaction-details h3 {
+            margin-bottom: 16px;
+        }
+
+        .transaction-details .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .transaction-details .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .next-steps {
+            background: var(--gray-50);
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 32px;
+            text-align: left;
+        }
+
+        .next-steps h3 {
+            margin-bottom: 16px;
+        }
+
+        .next-steps ol {
+            margin-left: 20px;
+        }
+
+        .next-steps li {
+            margin-bottom: 8px;
+        }
+
+        .success-actions {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 20px;
+            }
+
+            .header {
+                padding: 0 20px;
+            }
+
+            .nav {
+                display: none;
+            }
+
+            .hero-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .hero-text h1 {
+                font-size: 32px;
+            }
+
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .banks-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .payment-content {
+                grid-template-columns: 1fr;
+            }
+
+            .payment-summary {
+                position: static;
+            }
+
+            .screen-nav {
+                position: static;
+                margin: 20px;
+                display: none;
+            }
+        }
+
+        /* Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Loading */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--gray-300);
+            border-radius: 50%;
+            border-top-color: var(--primary-blue);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <a href="#" class="logo">💳 Kredi Al</a>
+        <nav>
+            <ul class="nav">
+                <li><a href="#landing">Ana Sayfa</a></li>
+                <li><a href="#order">Sipariş</a></li>
+                <li><a href="#login">Giriş</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Screen Navigation -->
+    <div class="screen-nav">
+        <h3>📱 Ekranlar</h3>
+        <ul>
+            <li><a href="#" class="screen-link active" data-screen="landing">🏠 Ana Sayfa</a></li>
+            <li><a href="#" class="screen-link" data-screen="order">📦 Sipariş</a></li>
+            <li><a href="#" class="screen-link" data-screen="login">👤 Giriş</a></li>
+            <li><a href="#" class="screen-link" data-screen="findeks">🎯 Findeks Onayı + Ödeme</a></li>
+            <li><a href="#" class="screen-link" data-screen="offers">🏦 Banka Teklifleri</a></li>
+            <li><a href="#" class="screen-link" data-screen="commission-payment">💰 Komisyon Ödemesi</a></li>
+            <li><a href="#" class="screen-link" data-screen="success">✅ Başarı</a></li>
+        </ul>
+    </div>
+
+    <!-- Landing Page Screen -->
+    <div id="landing" class="screen active">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <div class="hero-text animate-fade-in">
+                        <h1>🎯 Taksitli Alışverişin En Kolay Yolu</h1>
+                        <p>Anında onay, düşük faiz, güvenli ödeme</p>
+                        <div class="hero-buttons">
+                            <a href="#" class="btn btn-primary">Hemen Başla</a>
+                            <a href="#" class="btn btn-secondary">Daha Fazla Bilgi</a>
+                        </div>
+                    </div>
+                    <div class="hero-image animate-fade-in">
+                        🛍️
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features -->
+        <section class="features">
+            <div class="container">
+                <h2>✨ Özellikler</h2>
+                <div class="features-grid">
+                    <div class="feature-card animate-fade-in">
+                        <div class="feature-icon">⚡</div>
+                        <h3>Anında Onay</h3>
+                        <p>2-3 dakika içinde kredi onayı</p>
+                    </div>
+                    <div class="feature-card animate-fade-in">
+                        <div class="feature-icon">🔒</div>
+                        <h3>Güvenli Ödeme</h3>
+                        <p>256-bit SSL şifreleme</p>
+                    </div>
+                    <div class="feature-card animate-fade-in">
+                        <div class="feature-icon">💰</div>
+                        <h3>Düşük Faiz</h3>
+                        <p>%1.79'dan başlayan faizler</p>
+                    </div>
+                    <div class="feature-card animate-fade-in">
+                        <div class="feature-icon">📱</div>
+                        <h3>Kolay Kullanım</h3>
+                        <p>Mobil uyumlu arayüz</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Banks -->
+        <section class="banks">
+            <div class="container">
+                <h2>🏦 Anlaşmalı Bankalar</h2>
+                <div class="banks-grid">
+                    <div class="bank-card animate-fade-in">
+                        <div class="bank-logo" style="color: #00A651;">Garanti BBVA</div>
+                        <h3>Garanti BBVA</h3>
+                        <ul>
+                            <li>12-36 ay taksit</li>
+                            <li>%1.89'dan başlayan</li>
+                            <li>Erken ödeme indirimi</li>
+                        </ul>
+                        <a href="#" class="btn btn-ghost">Detaylar</a>
+                    </div>
+                    <div class="bank-card animate-fade-in">
+                        <div class="bank-logo" style="color: #003DA5;">Yapı Kredi</div>
+                        <h3>Yapı Kredi</h3>
+                        <ul>
+                            <li>12-48 ay taksit</li>
+                            <li>%1.79'dan başlayan</li>
+                            <li>Taksit erteleme hakkı</li>
+                        </ul>
+                        <a href="#" class="btn btn-ghost">Detaylar</a>
+                    </div>
+                    <div class="bank-card animate-fade-in">
+                        <div class="bank-logo" style="color: #C41E3A;">İş Bankası</div>
+                        <h3>İş Bankası</h3>
+                        <ul>
+                            <li>12-60 ay taksit</li>
+                            <li>%1.99'dan başlayan</li>
+                            <li>Dijital dekont</li>
+                        </ul>
+                        <a href="#" class="btn btn-ghost">Detaylar</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Order Confirmation Screen -->
+    <div id="order" class="screen">
+        <section class="order-confirmation">
+            <div class="container">
+                <div class="order-card card">
+                    <div class="order-header">
+                        <h1>📦 Sipariş Özeti</h1>
+                        <p>Devam etmek için siparişinizi onaylayın</p>
+                    </div>
+
+                    <div class="product-details">
+                        <div class="product-image">📱</div>
+                        <div class="product-info">
+                            <h3>iPhone 15 Pro Max 256GB</h3>
+                            <p>Kategori: Elektronik</p>
+                            <p>SKU: IPH15PM256</p>
+                        </div>
+                    </div>
+
+                    <div class="price-breakdown">
+                        <div class="price-row">
+                            <span>Ürün Tutarı:</span>
+                            <span>15.000,00 ₺</span>
+                        </div>
+                        <div class="price-row">
+                            <span>KDV (%20):</span>
+                            <span>3.000,00 ₺</span>
+                        </div>
+                        <div class="price-row total">
+                            <span>Toplam:</span>
+                            <span>18.000,00 ₺</span>
+                        </div>
+                    </div>
+
+                    <div class="timer-badge">
+                        ⏱️ Bu teklif 72 saat geçerlidir
+                    </div>
+
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" checked>
+                            <span>Siparişi onaylıyorum ve devam etmek istiyorum</span>
+                        </label>
+                    </div>
+
+                    <button class="btn btn-primary" style="width: 100%;">
+                        Siparişi Onayla ve Devam Et
+                    </button>
+
+                    <p style="text-align: center; margin-top: 16px; color: var(--gray-500); font-size: 14px;">
+                        🔒 Güvenli ödeme - SSL şifreli
+                    </p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="login" class="screen">
+        <section class="login-screen">
+            <div class="container">
+                <div class="login-card card">
+                    <div class="login-header">
+                        <div class="icon">👤</div>
+                        <h1>Hoş Geldiniz</h1>
+                        <p>Devam etmek için giriş yapın</p>
+                    </div>
+
+                    <form>
+                        <div class="form-group">
+                            <label class="form-label">E-posta</label>
+                            <input type="email" class="form-input" value="test@example.com" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Şifre</label>
+                            <input type="password" class="form-input" value="********" required>
+                        </div>
+
+                        <div class="remember-forgot">
+                            <label>
+                                <input type="checkbox">
+                                <span>Beni hatırla</span>
+                            </label>
+                            <a href="#">Şifremi unuttum</a>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 16px;">
+                            Giriş Yap
+                        </button>
+                    </form>
+
+                    <div class="divider">
+                        <span>veya</span>
+                    </div>
+
+                    <div class="social-login">
+                        <button class="btn btn-secondary">🔵 Google ile Giriş</button>
+                        <button class="btn btn-secondary">📱 SMS ile Giriş</button>
+                    </div>
+
+                    <p style="margin-top: 24px;">
+                        Hesabınız yok mu? <a href="#" style="color: var(--primary-blue);">Kayıt Ol</a>
+                    </p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Findeks Approval Screen -->
+    <div id="findeks" class="screen">
+        <section class="findeks-screen">
+            <div class="container">
+                <div class="progress-steps">
+                    <div class="step active">1</div>
+                    <div class="step">2</div>
+                    <div class="step">3</div>
+                    <div class="step">4</div>
+                </div>
+
+                <div class="findeks-content">
+                    <div class="findeks-header">
+                        <h1>🎯 Kredi Onayı</h1>
+                        <p>Kredi başvurunuz için Findeks skorunuzun kontrol edilmesi gerekmektedir.</p>
+                    </div>
+
+                    <div class="card">
+                        <h2>📊 Findeks Kredi Skoru Kontrolü</h2>
+                        
+                        <ul class="info-list">
+                            <li>Hızlı onay (2-3 dakika)</li>
+                            <li>Güvenli sorgulama</li>
+                            <li>Kredi notunuza zarar vermez</li>
+                        </ul>
+
+                        <div class="required-info">
+                            <h3>Gerekli Bilgiler:</h3>
+                            <ul>
+                                <li>
+                                    <span>TC Kimlik No:</span>
+                                    <span class="status">✓ Kayıtlı</span>
+                                </li>
+                                <li>
+                                    <span>Telefon No:</span>
+                                    <span class="status">✓ Doğrulandı</span>
+                                </li>
+                                <li>
+                                    <span>E-posta:</span>
+                                    <span class="status">✓ Doğrulandı</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="checkbox-group">
+                            <label>
+                                <input type="checkbox">
+                                <span>Findeks sorgulama iznini veriyorum</span>
+                            </label>
+                        </div>
+
+                        <div class="checkbox-group">
+                            <label>
+                                <input type="checkbox">
+                                <span>KVKK metnini okudum ve kabul ediyorum</span>
+                            </label>
+                        </div>
+
+                        <div class="payment-section" style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--gray-200);">
+                            <h3 style="margin-bottom: 16px;">💳 Findeks Ödemesi</h3>
+                            
+                            <div class="payment-amount-card" style="background: var(--secondary-yellow); color: var(--gray-900); padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                                <div style="font-size: 14px; margin-bottom: 8px;">Sorgulama Ücreti</div>
+                                <div style="font-size: 24px; font-weight: 700;">35,40 ₺</div>
+                                <div style="font-size: 12px; margin-top: 4px; opacity: 0.8;">Kredi skoru + hizmet ücreti + KDV</div>
+                            </div>
+
+                            <div class="payment-methods" style="margin-bottom: 20px;">
+                                <div class="radio-group">
+                                    <label>
+                                        <input type="radio" name="findeks-payment" checked>
+                                        <span>Kredi/Banka Kartı</span>
+                                    </label>
+                                </div>
+                                <div class="radio-group">
+                                    <label>
+                                        <input type="radio" name="findeks-payment">
+                                        <span>Havale/EFT</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <form style="margin-bottom: 16px;">
+                                <div class="form-group">
+                                    <label class="form-label">Kart Numarası</label>
+                                    <input type="text" class="form-input" placeholder="1234 5678 9012 3456">
+                                </div>
+
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                    <div class="form-group">
+                                        <label class="form-label">Son Kullanma</label>
+                                        <input type="text" class="form-input" placeholder="12/25">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">CVV</label>
+                                        <input type="text" class="form-input" placeholder="123">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Kart Sahibi</label>
+                                    <input type="text" class="form-input" value="MUSTAFA YASAR">
+                                </div>
+
+                                <div class="checkbox-group">
+                                    <label>
+                                        <input type="checkbox" checked>
+                                        <span>Ödeme koşullarını kabul ediyorum</span>
+                                    </label>
+                                </div>
+                            </form>
+                        </div>
+
+                        <button class="btn btn-primary" style="width: 100%;">
+                            Findeks Onayı Al ve Öde - 35,40 ₺
+                        </button>
+
+                        <p style="text-align: center; margin-top: 16px; color: var(--gray-500); font-size: 14px;">
+                            🔒 256-bit SSL şifreleme ile güvence altında
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Bank Offers Screen -->
+    <div id="offers" class="screen">
+        <section class="bank-offers-screen">
+            <div class="container">
+                <div class="progress-steps">
+                    <div class="step completed">1</div>
+                    <div class="step active">2</div>
+                    <div class="step">3</div>
+                    <div class="step">4</div>
+                </div>
+
+                <div class="offers-header">
+                    <h1>🏦 Banka Teklifleri</h1>
+                    <div class="amount-display">Kredi tutarı: 15.000,00 ₺ için 9 teklif</div>
+                </div>
+
+                <div class="filters">
+                    <select class="filter-select">
+                        <option>12 ay</option>
+                        <option>24 ay</option>
+                        <option>36 ay</option>
+                    </select>
+                    <select class="filter-select">
+                        <option>Tüm bankalar</option>
+                        <option>Garanti BBVA</option>
+                        <option>Yapı Kredi</option>
+                        <option>İş Bankası</option>
+                    </select>
+                    <select class="filter-select">
+                        <option>En düşük faiz</option>
+                        <option>En düşük taksit</option>
+                        <option>En hızlı onay</option>
+                    </select>
+                </div>
+
+                <div class="offers-grid">
+                    <div class="offer-card recommended">
+                        <div class="offer-header">
+                            <div class="bank-name">Garanti BBVA</div>
+                        </div>
+                        <div class="offer-details">
+                            <p>12 Aylık Taksit</p>
+                            <p>Faiz Oranı: %1.89</p>
+                        </div>
+                        <div class="offer-price">
+                            Aylık Ödeme: 1.350,50 ₺
+                        </div>
+                        <div class="offer-price" style="font-size: 16px; color: var(--gray-700);">
+                            Toplam Geri Ödeme: 16.206,00 ₺
+                        </div>
+                        <div class="offer-actions">
+                            <button class="btn btn-ghost">Detaylar ▼</button>
+                            <button class="btn btn-primary">Bu Teklifi Seç →</button>
+                        </div>
+                    </div>
+
+                    <div class="offer-card">
+                        <div class="offer-header">
+                            <div class="bank-name">Yapı Kredi</div>
+                        </div>
+                        <div class="offer-details">
+                            <p>12 Aylık Taksit</p>
+                            <p>Faiz Oranı: %1.79</p>
+                        </div>
+                        <div class="offer-price">
+                            Aylık Ödeme: 1.340,25 ₺
+                        </div>
+                        <div class="offer-price" style="font-size: 16px; color: var(--gray-700);">
+                            Toplam Geri Ödeme: 16.083,00 ₺
+                        </div>
+                        <div class="offer-actions">
+                            <button class="btn btn-ghost">Detaylar ▼</button>
+                            <button class="btn btn-primary">Bu Teklifi Seç →</button>
+                        </div>
+                    </div>
+
+                    <div class="offer-card">
+                        <div class="offer-header">
+                            <div class="bank-name">İş Bankası</div>
+                        </div>
+                        <div class="offer-details">
+                            <p>12 Aylık Taksit</p>
+                            <p>Faiz Oranı: %1.99</p>
+                        </div>
+                        <div class="offer-price">
+                            Aylık Ödeme: 1.360,75 ₺
+                        </div>
+                        <div class="offer-price" style="font-size: 16px; color: var(--gray-700);">
+                            Toplam Geri Ödeme: 16.329,00 ₺
+                        </div>
+                        <div class="offer-actions">
+                            <button class="btn btn-ghost">Detaylar ▼</button>
+                            <button class="btn btn-primary">Bu Teklifi Seç →</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 32px; padding: 16px; background: var(--primary-blue-light); border-radius: 8px;">
+                    💡 Tüm teklifler 24 saat geçerlidir
+                </div>
+            </div>
+        </section>
+    </div>
+
+    
+    <!-- Commission Payment Screen -->
+    <div id="commission-payment" class="screen">
+        <section class="payment-screen">
+            <div class="container">
+                <div class="progress-steps">
+                    <div class="step completed">1</div>
+                    <div class="step completed">2</div>
+                    <div class="step completed">3</div>
+                    <div class="step active">4</div>
+                </div>
+
+                <div class="payment-content">
+                    <div class="payment-main">
+                        <div class="payment-header">
+                            <h1>�� Komisyon Ödemesi</h1>
+                        </div>
+
+                        <div class="commission-card">
+                            <h2>💳 Komisyon Tutarı</h2>
+                            <div class="commission-breakdown">
+                                <div class="price-row">
+                                    <span>Kefalet Komisyonu:</span>
+                                    <span>150,00 ₺</span>
+                                </div>
+                                <div class="price-row">
+                                    <span>İşlem Ücreti:</span>
+                                    <span>50,00 ₺</span>
+                                </div>
+                                <div class="price-row">
+                                    <span>KDV (%18):</span>
+                                    <span>36,00 ₺</span>
+                                </div>
+                                <div class="price-row total">
+                                    <span>Toplam:</span>
+                                    <span>236,00 ₺</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="payment-methods">
+                            <h3>Ödeme Yöntemi</h3>
+                            <div class="radio-group">
+                                <label>
+                                    <input type="radio" name="payment" checked>
+                                    <span>Kredi/Banka Kartı</span>
+                                </label>
+                            </div>
+                            <div class="radio-group">
+                                <label>
+                                    <input type="radio" name="payment">
+                                    <span>Havale/EFT</span>
+                                </label>
+                            </div>
+                            <div class="radio-group">
+                                <label>
+                                    <input type="radio" name="payment">
+                                    <span>Dijital Cüzdan (PayPal, Apple Pay)</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <form>
+                            <div class="form-group">
+                                <label class="form-label">Kart Numarası</label>
+                                <input type="text" class="form-input" placeholder="1234 5678 9012 3456">
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                <div class="form-group">
+                                    <label class="form-label">Son Kullanma</label>
+                                    <input type="text" class="form-input" placeholder="12/25">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">CVV</label>
+                                    <input type="text" class="form-input" placeholder="123">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Kart Sahibi</label>
+                                <input type="text" class="form-input" value="MUSTAFA YASAR">
+                            </div>
+
+                            <div class="checkbox-group">
+                                <label>
+                                    <input type="checkbox" checked>
+                                    <span>Ödeme koşullarını kabul ediyorum</span>
+                                </label>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                                Komisyon Ödemesini Yap - 236,00 ₺
+                            </button>
+                        </form>
+
+                        <p style="text-align: center; margin-top: 16px; color: var(--gray-500); font-size: 14px;">
+                            🔒 256-bit SSL şifreleme ile güvence altında
+                        </p>
+                    </div>
+
+                    <div class="payment-summary">
+                        <div class="summary-card">
+                            <h3>Seçilen Teklif</h3>
+                            <div style="margin-bottom: 16px;">
+                                <div style="font-size: 14px; color: var(--gray-700); margin-bottom: 4px;">Garanti BBVA</div>
+                                <div style="font-size: 16px; font-weight: 600;">12 Aylık Taksit - %1.89 faiz</div>
+                            </div>
+                            <div style="font-size: 20px; font-weight: 600; color: var(--primary-blue);">
+                                Aylık: 1.350,50 ₺
+                            </div>
+                            <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--gray-200);">
+                                <div style="font-size: 14px; color: var(--gray-700); margin-bottom: 4px;">Toplam Ödenen:</div>
+                                <div style="font-size: 16px; font-weight: 600;">Findeks: 35,40 ₺ + Komisyon: 236,00 ₺</div>
+                                <div style="font-size: 18px; font-weight: 700; color: var(--secondary-green); margin-top: 8px;">
+                                    Toplam: 271,40 ₺
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Success Screen -->
+    <div id="success" class="screen">
+        <section class="success-screen">
+            <div class="container">
+                <div class="success-content">
+                    <div class="progress-steps">
+                        <div class="step completed">1</div>
+                        <div class="step completed">2</div>
+                        <div class="step completed">3</div>
+                        <div class="step completed">4</div>
+                    </div>
+
+                    <div class="success-icon">✅</div>
+                    
+                    <div class="success-header">
+                        <h1>Tebrikler!</h1>
+                        <p>Kredi başvurunuz onaylandı</p>
+                    </div>
+
+                    <div class="transaction-details">
+                        <h3>İşlem Detayları</h3>
+                        <div class="detail-row">
+                            <span>İşlem No:</span>
+                            <span>#KA-2024-001234</span>
+                        </div>
+                        <div class="detail-row">
+                            <span>Tarih:</span>
+                            <span>30 Mart 2024, 14:30</span>
+                        </div>
+                        <div class="detail-row">
+                            <span>Kredi Tutarı:</span>
+                            <span>15.000,00 ₺</span>
+                        </div>
+                        <div class="detail-row">
+                            <span>Taksit Sayısı:</span>
+                            <span>12 ay</span>
+                        </div>
+                        <div class="detail-row">
+                            <span>Aylık Ödeme:</span>
+                            <span>1.350,50 ₺</span>
+                        </div>
+                        <div class="detail-row">
+                            <span>İlk Taksit:</span>
+                            <span>01.05.2024</span>
+                        </div>
+                        <div class="detail-row">
+                            <span>Banka:</span>
+                            <span>Garanti BBVA</span>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin-bottom: 32px;">
+                        <div style="margin-bottom: 16px;">
+                            <span style="font-size: 20px;">📧</span>
+                            <span style="margin-left: 8px;">Detaylı bilgiler e-posta adresinize gönderildi</span>
+                        </div>
+                        <div>
+                            <span style="font-size: 20px;">📱</span>
+                            <span style="margin-left: 8px;">SMS ile onay kodu: ******</span>
+                        </div>
+                    </div>
+
+                    <div class="next-steps">
+                        <h3>Sırada Ne Var?</h3>
+                        <ol>
+                            <li>Banka onay sürecini tamamlayın (2-3 iş günü)</li>
+                            <li>Sözleşmeyi dijital olarak imzalayın</li>
+                            <li>Kredi tutarı hesabınıza aktarılsın</li>
+                        </ol>
+                    </div>
+
+                    <div class="success-actions">
+                        <button class="btn btn-secondary">Sözleşmeyi Görüntüle</button>
+                        <button class="btn btn-secondary">İşlemlerim</button>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 32px;">
+                        <button class="btn btn-primary">Ana Sayfaya Dön</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Screen Navigation
+        const screenLinks = document.querySelectorAll('.screen-link');
+        const screens = document.querySelectorAll('.screen');
+
+        screenLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // Remove active class from all
+                screenLinks.forEach(l => l.classList.remove('active'));
+                screens.forEach(s => s.classList.remove('active'));
+                
+                // Add active class to clicked
+                link.classList.add('active');
+                const screenId = link.dataset.screen;
+                document.getElementById(screenId).classList.add('active');
+                
+                // Scroll to top
+                window.scrollTo(0, 0);
+            });
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                if (href !== '#') {
+                    e.preventDefault();
+                    const target = document.querySelector(href);
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                }
+            });
+        });
+
+        // Form submissions (prevent default for demo)
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                alert('Bu bir demo prototiptir. Form gönderimi simüle edilmiştir.');
+            });
+        });
+
+        // Intersection Observer for animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, {
+            threshold: 0.1
+        });
+
+        document.querySelectorAll('.animate-fade-in').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'all 0.6s ease-out';
+            observer.observe(el);
+        });
+
+        // Button interactions
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                if (!btn.closest('form')) {
+                    e.preventDefault();
+                    
+                    // Add ripple effect
+                    const ripple = document.createElement('span');
+                    ripple.style.position = 'absolute';
+                    ripple.style.borderRadius = '50%';
+                    ripple.style.background = 'rgba(255, 255, 255, 0.5)';
+                    ripple.style.width = '20px';
+                    ripple.style.height = '20px';
+                    ripple.style.animation = 'ripple 0.6s ease-out';
+                    ripple.style.pointerEvents = 'none';
+                    
+                    const rect = btn.getBoundingClientRect();
+                    ripple.style.left = (e.clientX - rect.left - 10) + 'px';
+                    ripple.style.top = (e.clientY - rect.top - 10) + 'px';
+                    
+                    btn.style.position = 'relative';
+                    btn.style.overflow = 'hidden';
+                    btn.appendChild(ripple);
+                    
+                    setTimeout(() => ripple.remove(), 600);
+                }
+            });
+        });
+
+        // Add ripple animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

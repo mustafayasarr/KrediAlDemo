@@ -8,7 +8,7 @@ using System.Security.Claims;
 namespace KrediAl.API.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/[controller]/[action]")]
 [Produces("application/json")]
 [SwaggerTag("Transaction")]
 public class TransactionController : ControllerBase
@@ -467,6 +467,187 @@ public class TransactionController : ControllerBase
         {
             _logger.LogError(ex, "Error selecting bank offer");
             return StatusCode(500, ApiResponse.ErrorResponse("Banka teklifi seçilirken hata oluştu", new List<string> { ex.Message }));
+        }
+    }
+
+    [HttpGet("{transactionId}/order-summary")]
+    [SwaggerOperation(
+        Summary = "📋 Sipariş özetini getir",
+        Description = @"**Kullanım Senaryosu:** Müşteriye sipariş detayları ve komisyon bilgilerini gösterme.
+
+**Ne Yapar?**
+1. Transaction'a ait sipariş detaylarını getirir
+2. Komisyon tutarını hesaplar
+3. Kalan süreyi gösterir
+
+**Örnek Akış:**
+1. Müşteri işleme başlamadan önce özet gösterilir
+2. Toplam tutar, komisyon ve ürün detayları görüntülenir
+
+**Kim Çağırabilir?**
+- Herkes (authentication gerekmez)",
+        OperationId = "GetOrderSummary",
+        Tags = new[] { "Transaction" }
+    )]
+    [SwaggerResponse(200, "Sipariş özeti", typeof(ApiResponse<OrderSummaryDto>))]
+    [SwaggerResponse(404, "Transaction bulunamadı", typeof(ApiResponse))]
+    public async Task<ActionResult<ApiResponse<OrderSummaryDto>>> GetOrderSummary(Guid transactionId)
+    {
+        try
+        {
+            var summary = await _transactionService.GetOrderSummaryAsync(transactionId);
+            return Ok(ApiResponse<OrderSummaryDto>.SuccessResponse(summary, "Sipariş özeti başarıyla getirildi"));
+        }
+        catch (InvalidOperationException ex)
+        {
+            return NotFound(ApiResponse.ErrorResponse("Transaction bulunamadı", new List<string> { ex.Message }));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting order summary");
+            return StatusCode(500, ApiResponse.ErrorResponse("Sipariş özeti getirilirken hata oluştu", new List<string> { ex.Message }));
+        }
+    }
+
+    [HttpPost("{transactionId}/cancel-with-reason")]
+    [Authorize]
+    [SwaggerOperation(
+        Summary = "❌ İşlemi iptal et (nedeni ile)",
+        Description = @"**Kullanım Senaryosu:** Müşterinin işlemi iptal etmesi ve neden belirtmesi.
+
+**Ne Yapar?**
+1. İşlemi iptal eder
+2. Komisyon ödenmişse iade işlemi başlatır
+3. Pazaryerine iptal bildirimi gönderir
+
+**Örnek Akış:**
+1. Müşteri 'İptal Et' butonuna tıklar
+2. İptal nedeni seçer/yazar
+3. Onay verir
+4. İşlem iptal edilir ve komisyon iade edilir
+
+**Kim Çağırabilir?**
+- Sadece işlem sahibi kullanıcı (authentication gerekir)",
+        OperationId = "CancelTransactionWithReason",
+        Tags = new[] { "Transaction" }
+    )]
+    [SwaggerResponse(200, "İşlem iptal edildi", typeof(ApiResponse))]
+    [SwaggerResponse(400, "İşlem iptal edilemedi", typeof(ApiResponse))]
+    [SwaggerResponse(401, "Yetkisiz erişim", typeof(ApiResponse))]
+    public async Task<ActionResult<ApiResponse>> CancelTransactionWithReason(Guid transactionId, [FromBody] CancelTransactionRequest request)
+    {
+        try
+        {
+            var userId = GetUserId();
+            var result = await _transactionService.CancelTransactionWithReasonAsync(transactionId, userId, request);
+            if (result)
+            {
+                return Ok(ApiResponse.SuccessResponse("İşlem başarıyla iptal edildi"));
+            }
+            return BadRequest(ApiResponse.ErrorResponse("İşlem iptal edilemedi"));
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ApiResponse.ErrorResponse(ex.Message));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error cancelling transaction");
+            return StatusCode(500, ApiResponse.ErrorResponse("İşlem iptal edilirken hata oluştu", new List<string> { ex.Message }));
+        }
+    }
+
+    [HttpGet("{transactionId}/continue-option")]
+    [Authorize]
+    [SwaggerOperation(
+        Summary = "🔄 İşleme devam seçeneğini kontrol et",
+        Description = @"**Kullanım Senaryosu:** Müşterinin 3 gün içinde geri dönüp işleme devam edip edemeyeceğini kontrol etme.
+
+**Ne Yapar?**
+1. Komisyon ödenip ödenmediğini kontrol eder
+2. Sürenin dolup dolmadığını kontrol eder
+3. Kalan gün sayısını hesaplar
+4. Devam edebilir mi bilgisini döner
+
+**Örnek Akış:**
+1. Müşteri komisyon ödedikten sonra çıkış yapar
+2. 2 gün sonra geri gelir
+3. Bu endpoint çağrılır
+4. 'Devam edebilirsiniz, 1 gün süreniz kaldı' mesajı gösterilir
+
+**Kim Çağırabilir?**
+- Sadece işlem sahibi kullanıcı (authentication gerekir)",
+        OperationId = "GetContinueOption",
+        Tags = new[] { "Transaction" }
+    )]
+    [SwaggerResponse(200, "Devam seçeneği bilgisi", typeof(ApiResponse<ContinueOptionDto>))]
+    [SwaggerResponse(404, "Transaction bulunamadı", typeof(ApiResponse))]
+    [SwaggerResponse(401, "Yetkisiz erişim", typeof(ApiResponse))]
+    public async Task<ActionResult<ApiResponse<ContinueOptionDto>>> GetContinueOption(Guid transactionId)
+    {
+        try
+        {
+            var userId = GetUserId();
+            var option = await _transactionService.GetContinueOptionAsync(transactionId, userId);
+            return Ok(ApiResponse<ContinueOptionDto>.SuccessResponse(option, "Devam seçeneği bilgisi getirildi"));
+        }
+        catch (InvalidOperationException ex)
+        {
+            return NotFound(ApiResponse.ErrorResponse("Transaction bulunamadı", new List<string> { ex.Message }));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting continue option");
+            return StatusCode(500, ApiResponse.ErrorResponse("Devam seçeneği kontrol edilirken hata oluştu", new List<string> { ex.Message }));
+        }
+    }
+
+    [HttpPost("{transactionId}/refund-commission")]
+    [Authorize]
+    [SwaggerOperation(
+        Summary = "💰 Komisyon iadesini başlat",
+        Description = @"**Kullanım Senaryosu:** Müşterinin ödediği komisyonun iade edilmesi.
+
+**Ne Yapar?**
+1. Komisyon ödemesini kontrol eder
+2. İade işlemini başlatır
+3. İade referans numarası oluşturur
+4. Payment durumunu 'Refunded' yapar
+
+**Örnek Akış:**
+1. Müşteri işlemi iptal eder
+2. Bu endpoint çağrılır
+3. Komisyon iade edilir
+4. İade bilgileri döner
+
+**Kim Çağırabilir?**
+- Sadece işlem sahibi kullanıcı (authentication gerekir)",
+        OperationId = "RefundCommission",
+        Tags = new[] { "Transaction" }
+    )]
+    [SwaggerResponse(200, "Komisyon iade edildi", typeof(ApiResponse<RefundCommissionResponse>))]
+    [SwaggerResponse(400, "İade işlemi başarısız", typeof(ApiResponse))]
+    [SwaggerResponse(401, "Yetkisiz erişim", typeof(ApiResponse))]
+    public async Task<ActionResult<ApiResponse<RefundCommissionResponse>>> RefundCommission(Guid transactionId)
+    {
+        try
+        {
+            var userId = GetUserId();
+            var response = await _transactionService.RefundCommissionAsync(transactionId, userId);
+            if (response.Success)
+            {
+                return Ok(ApiResponse<RefundCommissionResponse>.SuccessResponse(response, "Komisyon başarıyla iade edildi"));
+            }
+            return BadRequest(ApiResponse<RefundCommissionResponse>.ErrorResponse("Komisyon iadesi başarısız oldu"));
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ApiResponse.ErrorResponse(ex.Message));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error refunding commission");
+            return StatusCode(500, ApiResponse.ErrorResponse("Komisyon iadesi sırasında hata oluştu", new List<string> { ex.Message }));
         }
     }
 

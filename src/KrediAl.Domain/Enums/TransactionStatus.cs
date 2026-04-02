@@ -9,9 +9,13 @@ public enum TransactionStatus
     FindeksApproved,
     BankOffersReceived,
     CommissionPaid,
+    CommissionRefunded,        // Komisyon iade edildi
     BankRedirected,
+    BankSelectionPending,      // Banka seçimi bekleniyor
+    BankSelectionExpired,      // Banka seçim süresi doldu
+    PendingUserReturn,         // 3 gün içinde geri dönüş bekleniyor
     Completed,
-    Rejected,
+    RejectedByUser,            // Müşteri tarafından reddedildi
     Cancelled,
     Expired
 }

@@ -161,17 +161,15 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-if (app.Environment.IsDevelopment())
-{
     app.UseDeveloperExceptionPage();
-    app.UseSwagger();
+
+   app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Kredi Al API v1");
         c.RoutePrefix = string.Empty;
         c.DocumentTitle = "Kredi Al API Documentation";
     });
-}
 
 app.UseCors("AllowSwagger");
 app.UseStaticFiles(); // wwwroot dosyalarını sunmak için

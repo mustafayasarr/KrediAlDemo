@@ -74,4 +74,24 @@ public class MarketplaceService : IMarketplaceService
 
         return true;
     }
+
+    public async Task<bool> NotifyCancellationAsync(Guid transactionId, string reason)
+    {
+        var transaction = await _context.Transactions
+            .Include(t => t.Marketplace)
+            .FirstOrDefaultAsync(t => t.Id == transactionId);
+
+        if (transaction == null)
+        {
+            return false;
+        }
+
+        _logger.LogInformation(
+            "Notifying marketplace {MarketplaceName} about order {OrderId} cancellation. Reason: {Reason}",
+            transaction.Marketplace.Name,
+            transaction.OrderId,
+            reason);
+
+        return true;
+    }
 }

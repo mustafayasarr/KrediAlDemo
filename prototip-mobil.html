@@ -1,0 +1,1671 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kredi Al - Mobil Prototip</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #2563EB;
+            --primary-blue-dark: #1E40AF;
+            --primary-blue-light: #DBEAFE;
+            --secondary-green: #10B981;
+            --secondary-red: #EF4444;
+            --secondary-yellow: #F59E0B;
+            --gray-50: #F9FAFB;
+            --gray-100: #F3F4F6;
+            --gray-200: #E5E7EB;
+            --gray-300: #D1D5DB;
+            --gray-500: #6B7280;
+            --gray-700: #374151;
+            --gray-900: #111827;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--gray-900);
+            background: var(--gray-50);
+            overflow-x: hidden;
+        }
+
+        /* Mobile Frame Container */
+        .mobile-container {
+            max-width: 375px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            position: relative;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Status Bar */
+        .status-bar {
+            height: 44px;
+            background: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 14px;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .status-left {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .status-right {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Header */
+        .header {
+            height: 60px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            border-bottom: 1px solid var(--gray-200);
+            position: sticky;
+            top: 44px;
+            z-index: 999;
+        }
+
+        .header-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .header-action {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background: var(--gray-100);
+            color: var(--gray-700);
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        /* Content Area */
+        .content {
+            padding: 16px;
+            padding-bottom: 100px; /* Bottom navigation space */
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            min-height: 48px;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .btn-primary:active {
+            background: var(--primary-blue-dark);
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-blue);
+        }
+
+        .btn-secondary:active {
+            background: var(--primary-blue-light);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--gray-700);
+        }
+
+        .btn-ghost:active {
+            background: var(--gray-100);
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 16px;
+            transition: all 0.3s;
+        }
+
+        .card:active {
+            transform: scale(0.98);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--gray-700);
+            font-size: 14px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--gray-300);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.2s;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* Progress */
+        .progress-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 24px;
+            padding: 16px 0;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--gray-300);
+            transition: all 0.3s;
+        }
+
+        .dot.active {
+            width: 24px;
+            border-radius: 4px;
+            background: var(--primary-blue);
+        }
+
+        .dot.completed {
+            background: var(--secondary-green);
+        }
+
+        /* Screen Navigation */
+        .screen-nav {
+            position: fixed;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            background: white;
+            border-radius: 12px;
+            padding: 8px;
+            box-shadow: var(--shadow-lg);
+            z-index: 1001;
+            max-width: 150px;
+        }
+
+        .screen-nav h3 {
+            font-size: 12px;
+            margin-bottom: 8px;
+            color: var(--gray-700);
+            text-align: center;
+        }
+
+        .screen-nav ul {
+            list-style: none;
+        }
+
+        .screen-nav li {
+            margin-bottom: 4px;
+        }
+
+        .screen-nav a {
+            display: block;
+            padding: 6px 8px;
+            border-radius: 6px;
+            text-decoration: none;
+            color: var(--gray-700);
+            font-size: 11px;
+            transition: all 0.2s;
+        }
+
+        .screen-nav a:hover,
+        .screen-nav a.active {
+            background: var(--primary-blue-light);
+            color: var(--primary-blue);
+        }
+
+        /* Screen Sections */
+        .screen {
+            display: none;
+            min-height: calc(100vh - 44px);
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* Splash Screen */
+        .splash-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 44px);
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .splash-logo {
+            font-size: 80px;
+            margin-bottom: 24px;
+            animation: logoBounce 1s ease-out;
+        }
+
+        @keyframes logoBounce {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .splash-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .splash-subtitle {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 40px;
+        }
+
+        .splash-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Home Screen */
+        .greeting {
+            margin-bottom: 24px;
+        }
+
+        .greeting h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .greeting p {
+            color: var(--gray-700);
+            font-size: 14px;
+        }
+
+        .active-loan-card {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 20px;
+            margin-bottom: 24px;
+        }
+
+        .active-loan-card h3 {
+            font-size: 16px;
+            margin-bottom: 16px;
+            opacity: 0.9;
+        }
+
+        .loan-amount {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .loan-progress {
+            margin-bottom: 16px;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: white;
+            border-radius: 2px;
+            width: 66%; /* 8/12 taksit */
+        }
+
+        .next-payment {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+
+        .next-payment p {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-bottom: 4px;
+        }
+
+        .next-payment .amount {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .quick-actions {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .action-card {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .action-card:active {
+            transform: scale(0.95);
+            box-shadow: var(--shadow-md);
+        }
+
+        .action-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .action-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .transactions {
+            margin-bottom: 24px;
+        }
+
+        .transaction-item {
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+            transition: all 0.3s;
+        }
+
+        .transaction-item:active {
+            transform: scale(0.98);
+            box-shadow: var(--shadow-md);
+        }
+
+        .transaction-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: var(--primary-blue-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .transaction-details {
+            flex: 1;
+        }
+
+        .transaction-title {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .transaction-date {
+            font-size: 12px;
+            color: var(--gray-500);
+        }
+
+        .transaction-amount {
+            font-weight: 600;
+            color: var(--primary-blue);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid var(--gray-200);
+            padding: 8px 0 20px 0; /* Safe area bottom */
+            z-index: 1000;
+        }
+
+        .nav-items {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px;
+            text-decoration: none;
+            color: var(--gray-500);
+            font-size: 11px;
+            transition: all 0.2s;
+            min-width: 60px;
+        }
+
+        .nav-item.active {
+            color: var(--primary-blue);
+        }
+
+        .nav-item:active {
+            transform: scale(0.9);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        /* Bank Offers Screen */
+        .amount-display {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .amount-display .amount {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 4px;
+        }
+
+        .amount-display .description {
+            font-size: 14px;
+            color: var(--gray-700);
+        }
+
+        .installment-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            padding: 4px;
+            background: var(--gray-100);
+            border-radius: 12px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 8px 16px;
+            border-radius: 8px;
+            background: transparent;
+            border: none;
+            color: var(--gray-700);
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .tab.active {
+            background: white;
+            color: var(--primary-blue);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .offer-cards {
+            margin-bottom: 24px;
+        }
+
+        .offer-card {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 16px;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .offer-card.recommended {
+            border-color: var(--primary-blue);
+        }
+
+        .offer-card.recommended::before {
+            content: "⭐ Önerilen";
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: var(--primary-blue);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .offer-bank {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .bank-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--gray-100);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        .bank-name {
+            font-family: 'Poppins', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .offer-installment {
+            font-size: 14px;
+            color: var(--gray-700);
+            margin-bottom: 8px;
+        }
+
+        .offer-interest {
+            font-size: 14px;
+            color: var(--gray-700);
+            margin-bottom: 16px;
+        }
+
+        .offer-price {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 16px;
+        }
+
+        .offer-total {
+            font-size: 14px;
+            color: var(--gray-700);
+            margin-bottom: 16px;
+        }
+
+        .offer-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .offer-actions .btn {
+            flex: 1;
+        }
+
+        .swipe-indicator {
+            text-align: center;
+            margin: 16px 0;
+            color: var(--gray-500);
+            font-size: 14px;
+        }
+
+        .swipe-dots {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .swipe-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--gray-300);
+        }
+
+        .swipe-dot.active {
+            background: var(--primary-blue);
+        }
+
+        /* Payment Screen */
+        .payment-amount-card {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+            color: white;
+            padding: 32px 24px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .payment-amount-card .label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .payment-amount-card .amount {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .saved-cards {
+            margin-bottom: 24px;
+        }
+
+        .card-option {
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s;
+        }
+
+        .card-option:active {
+            transform: scale(0.98);
+            box-shadow: var(--shadow-md);
+        }
+
+        .card-radio {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--gray-300);
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .card-option.selected .card-radio {
+            border-color: var(--primary-blue);
+        }
+
+        .card-option.selected .card-radio::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary-blue);
+        }
+
+        .card-info {
+            flex: 1;
+        }
+
+        .card-number {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .card-bank {
+            font-size: 12px;
+            color: var(--gray-500);
+        }
+
+        .add-card-btn {
+            background: transparent;
+            border: 2px dashed var(--gray-300);
+            color: var(--gray-700);
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .add-card-btn:active {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+        }
+
+        .fixed-bottom-button {
+            position: fixed;
+            bottom: 80px; /* Above bottom nav */
+            left: 16px;
+            right: 16px;
+            background: white;
+            padding: 16px 0;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+            z-index: 999;
+        }
+
+        /* Face ID Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1002;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-card {
+            background: white;
+            border-radius: 24px;
+            padding: 32px;
+            margin: 20px;
+            text-align: center;
+            max-width: 280px;
+            animation: modalSlideUp 0.3s ease-out;
+        }
+
+        @keyframes modalSlideUp {
+            from {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .modal-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .modal-amount {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 16px;
+        }
+
+        .modal-scanning {
+            margin-bottom: 24px;
+        }
+
+        .scanning-animation {
+            width: 60px;
+            height: 60px;
+            border: 3px solid var(--gray-300);
+            border-radius: 50%;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scanning-animation::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: var(--primary-blue);
+            animation: scan 1.5s ease-in-out infinite;
+        }
+
+        @keyframes scan {
+            0%, 100% { transform: translateY(-100%); }
+            50% { transform: translateY(100%); }
+        }
+
+        .modal-cancel {
+            color: var(--gray-700);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        /* Profile Screen */
+        .profile-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 32px;
+            color: white;
+        }
+
+        .profile-name {
+            font-family: 'Poppins', sans-serif;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .profile-email {
+            font-size: 14px;
+            color: var(--gray-700);
+        }
+
+        .credit-score-card {
+            background: linear-gradient(135deg, var(--secondary-green) 0%, #059669 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .credit-score-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .credit-score-value {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .credit-score-rating {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .account-info {
+            margin-bottom: 24px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--gray-700);
+        }
+
+        .info-value {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .menu-list {
+            margin-bottom: 24px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--gray-100);
+            text-decoration: none;
+            color: var(--gray-900);
+            transition: all 0.2s;
+        }
+
+        .menu-item:active {
+            background: var(--gray-50);
+        }
+
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .menu-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--gray-100);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .menu-text {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .logout-btn {
+            background: var(--secondary-red);
+            color: white;
+            margin-top: 16px;
+        }
+
+        .logout-btn:active {
+            background: #dc2626;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 320px) {
+            .mobile-container {
+                max-width: 320px;
+            }
+            
+            .action-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .offer-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-container">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-left">
+                <span>9:41</span>
+            </div>
+            <div class="status-right">
+                <span>📶</span>
+                <span>📶</span>
+                <span>🔋</span>
+            </div>
+        </div>
+
+        <!-- Screen Navigation -->
+        <div class="screen-nav">
+            <h3>📱 Ekranlar</h3>
+            <ul>
+                <li><a href="#" class="screen-link active" data-screen="splash">🌟 Splash</a></li>
+                <li><a href="#" class="screen-link" data-screen="home">🏠 Home</a></li>
+                <li><a href="#" class="screen-link" data-screen="offers">🏦 Teklifler</a></li>
+                <li><a href="#" class="screen-link" data-screen="payment">💰 Ödeme</a></li>
+                <li><a href="#" class="screen-link" data-screen="profile">👤 Profil</a></li>
+            </ul>
+        </div>
+
+        <!-- Splash Screen -->
+        <div id="splash" class="screen active">
+            <div class="splash-content">
+                <div class="splash-logo">💳</div>
+                <div class="splash-title">Kredi Al</div>
+                <div class="splash-subtitle">Taksitli Alışverişin Kolay Yolu</div>
+                
+                <div class="splash-loading">
+                    <div class="spinner"></div>
+                    <div>Yükleniyor...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Home Screen -->
+        <div id="home" class="screen">
+            <div class="header">
+                <a href="#" class="header-action">☰</a>
+                <div class="header-title">Kredi Al</div>
+                <a href="#" class="header-action">🔔</a>
+            </div>
+
+            <div class="content">
+                <div class="greeting">
+                    <h2>Merhaba, Mustafa!</h2>
+                    <p>İyi günler dileriz</p>
+                </div>
+
+                <div class="active-loan-card">
+                    <h3>Aktif Krediniz</h3>
+                    <div class="loan-amount">12.500,00 ₺</div>
+                    <div class="loan-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <div style="font-size: 12px; margin-top: 4px;">8/12 taksit</div>
+                    </div>
+                    <div class="next-payment">
+                        <p>Sonraki ödeme</p>
+                        <div class="amount">1.350,50 ₺</div>
+                        <p style="font-size: 12px; margin-top: 4px;">01.05.2024</p>
+                    </div>
+                    <button class="btn btn-ghost" style="background: rgba(255,255,255,0.1); color: white;">
+                        Detaylar →
+                    </button>
+                </div>
+
+                <div class="quick-actions">
+                    <div class="section-title">Hızlı İşlemler</div>
+                    <div class="action-grid">
+                        <div class="action-card">
+                            <div class="action-icon">💰</div>
+                            <div class="action-title">Yeni Kredi</div>
+                        </div>
+                        <div class="action-card">
+                            <div class="action-icon">📊</div>
+                            <div class="action-title">Taksit Planı</div>
+                        </div>
+                        <div class="action-card">
+                            <div class="action-icon">📄</div>
+                            <div class="action-title">Belgeler</div>
+                        </div>
+                        <div class="action-card">
+                            <div class="action-icon">💳</div>
+                            <div class="action-title">Ödeme Yap</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="transactions">
+                    <div class="section-title">Son İşlemler</div>
+                    <div class="transaction-item">
+                        <div class="transaction-icon">💰</div>
+                        <div class="transaction-details">
+                            <div class="transaction-title">Taksit Ödemesi</div>
+                            <div class="transaction-date">01.04.2024</div>
+                        </div>
+                        <div class="transaction-amount">1.350,50 ₺</div>
+                    </div>
+                    <div class="transaction-item">
+                        <div class="transaction-icon">💰</div>
+                        <div class="transaction-details">
+                            <div class="transaction-title">Taksit Ödemesi</div>
+                            <div class="transaction-date">01.03.2024</div>
+                        </div>
+                        <div class="transaction-amount">1.350,50 ₺</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Navigation -->
+            <div class="bottom-nav">
+                <div class="nav-items">
+                    <a href="#" class="nav-item active">
+                        <div class="nav-icon">🏠</div>
+                        <div>Ana Sayfa</div>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <div class="nav-icon">📊</div>
+                        <div>İşlemlerim</div>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <div class="nav-icon">💳</div>
+                        <div>Ödemeler</div>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <div class="nav-icon">👤</div>
+                        <div>Profil</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bank Offers Screen -->
+        <div id="offers" class="screen">
+            <div class="header">
+                <a href="#" class="header-action">←</a>
+                <div class="header-title">Teklifler</div>
+                <a href="#" class="header-action">?</a>
+            </div>
+
+            <div class="content">
+                <div class="progress-dots">
+                    <div class="dot completed"></div>
+                    <div class="dot active"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+
+                <div class="amount-display">
+                    <div class="amount">15.000,00 ₺</div>
+                    <div class="description">için 9 teklif</div>
+                </div>
+
+                <div class="installment-tabs">
+                    <button class="tab active">12 Ay</button>
+                    <button class="tab">24 Ay</button>
+                    <button class="tab">36 Ay</button>
+                </div>
+
+                <div class="offer-cards">
+                    <div class="offer-card recommended">
+                        <div class="offer-bank">
+                            <div class="bank-logo" style="background: rgba(0, 166, 81, 0.1); color: #00A651;">G</div>
+                            <div class="bank-name">Garanti BBVA</div>
+                        </div>
+                        <div class="offer-installment">12 Aylık Taksit</div>
+                        <div class="offer-interest">Faiz Oranı: %1.89</div>
+                        <div class="offer-price">1.350,50 ₺/ay</div>
+                        <div class="offer-total">Toplam: 16.206,00 ₺</div>
+                        <div class="offer-actions">
+                            <button class="btn btn-ghost">Detaylar</button>
+                            <button class="btn btn-primary">Seç →</button>
+                        </div>
+                    </div>
+
+                    <div class="offer-card">
+                        <div class="offer-bank">
+                            <div class="bank-logo" style="background: rgba(0, 61, 165, 0.1); color: #003DA5;">Y</div>
+                            <div class="bank-name">Yapı Kredi</div>
+                        </div>
+                        <div class="offer-installment">12 Aylık Taksit</div>
+                        <div class="offer-interest">Faiz Oranı: %1.79</div>
+                        <div class="offer-price">1.340,25 ₺/ay</div>
+                        <div class="offer-total">Toplam: 16.083,00 ₺</div>
+                        <div class="offer-actions">
+                            <button class="btn btn-ghost">Detaylar</button>
+                            <button class="btn btn-primary">Seç →</button>
+                        </div>
+                    </div>
+
+                    <div class="offer-card">
+                        <div class="offer-bank">
+                            <div class="bank-logo" style="background: rgba(196, 30, 58, 0.1); color: #C41E3A;">İ</div>
+                            <div class="bank-name">İş Bankası</div>
+                        </div>
+                        <div class="offer-installment">12 Aylık Taksit</div>
+                        <div class="offer-interest">Faiz Oranı: %1.99</div>
+                        <div class="offer-price">1.360,75 ₺/ay</div>
+                        <div class="offer-total">Toplam: 16.329,00 ₺</div>
+                        <div class="offer-actions">
+                            <button class="btn btn-ghost">Detaylar</button>
+                            <button class="btn btn-primary">Seç →</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="swipe-indicator">
+                    <div>← Kaydır →</div>
+                    <div class="swipe-dots">
+                        <div class="swipe-dot active"></div>
+                        <div class="swipe-dot"></div>
+                        <div class="swipe-dot"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Navigation -->
+            <div class="bottom-nav">
+                <div class="nav-items">
+                    <a href="#" class="nav-item">
+                        <div class="nav-icon">🏠</div>
+                        <div>Ana Sayfa</div>
+                    </a>
+                    <a href="#" class="nav-item active">
+                        <div class="nav-icon">📊</div>
+                        <div>İşlemlerim</div>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <div class="nav-icon">💳</div>
+                        <div>Ödemeler</div>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <div class="nav-icon">👤</div>
+                        <div>Profil</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Screen -->
+        <div id="payment" class="screen">
+            <div class="header">
+                <a href="#" class="header-action">←</a>
+                <div class="header-title">Ödeme</div>
+                <a href="#" class="header-action">?</a>
+            </div>
+
+            <div class="content">
+                <div class="progress-dots">
+                    <div class="dot completed"></div>
+                    <div class="dot completed"></div>
+                    <div class="dot active"></div>
+                    <div class="dot"></div>
+                </div>
+
+                <div class="payment-amount-card">
+                    <div class="label">Toplam Tutar</div>
+                    <div class="amount">236,00 ₺</div>
+                </div>
+
+                <div class="saved-cards">
+                    <div class="section-title">Kayıtlı Kartlar</div>
+                    
+                    <div class="card-option selected">
+                        <div class="card-radio"></div>
+                        <div class="card-info">
+                            <div class="card-number">•••• 3456</div>
+                            <div class="card-bank">Garanti</div>
+                        </div>
+                    </div>
+
+                    <div class="card-option">
+                        <div class="card-radio"></div>
+                        <div class="card-info">
+                            <div class="card-number">•••• 7890</div>
+                            <div class="card-bank">Yapı Kredi</div>
+                        </div>
+                    </div>
+
+                    <button class="add-card-btn">
+                        + Yeni Kart Ekle
+                    </button>
+                </div>
+
+                <div class="fixed-bottom-button">
+                    <button class="btn btn-primary" onclick="showFaceIdModal()">
+                        Ödemeyi Tamamla
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bottom Navigation -->
+            <div class="bottom-nav">
+                <div class="nav-items">
+                    <a href="#" class="nav-item">
+                        <div class="nav-icon">🏠</div>
+                        <div>Ana Sayfa</div>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <div class="nav-icon">📊</div>
+                        <div>İşlemlerim</div>
+                    </a>
+                    <a href="#" class="nav-item active">
+                        <div class="nav-icon">💳</div>
+                        <div>Ödemeler</div>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <div class="nav-icon">👤</div>
+                        <div>Profil</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Screen -->
+        <div id="profile" class="screen">
+            <div class="header">
+                <a href="#" class="header-action">←</a>
+                <div class="header-title">Profil</div>
+                <a href="#" class="header-action">⚙️</a>
+            </div>
+
+            <div class="content">
+                <div class="profile-header">
+                    <div class="avatar">👤</div>
+                    <div class="profile-name">Mustafa Yaşar</div>
+                    <div class="profile-email">test@example.com</div>
+                </div>
+
+                <div class="credit-score-card">
+                    <div class="credit-score-label">Kredi Skoru</div>
+                    <div class="credit-score-value">⭐ 850</div>
+                    <div class="credit-score-rating">Mükemmel</div>
+                </div>
+
+                <div class="account-info">
+                    <div class="section-title">Hesap Bilgileri</div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">
+                            <span>📱</span>
+                            <span>Telefon</span>
+                        </div>
+                        <div class="info-value">+90 555 123 4567</div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">
+                            <span>🆔</span>
+                            <span>TC Kimlik</span>
+                        </div>
+                        <div class="info-value">123********89</div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">
+                            <span>📧</span>
+                            <span>E-posta</span>
+                        </div>
+                        <div class="info-value">test@example.com</div>
+                    </div>
+                </div>
+
+                <div class="menu-list">
+                    <div class="section-title">Menü</div>
+                    
+                    <a href="#" class="menu-item">
+                        <div class="menu-icon">🔔</div>
+                        <div class="menu-text">Bildirimler</div>
+                    </a>
+                    
+                    <a href="#" class="menu-item">
+                        <div class="menu-icon">🔒</div>
+                        <div class="menu-text">Güvenlik</div>
+                    </a>
+                    
+                    <a href="#" class="menu-item">
+                        <div class="menu-icon">💳</div>
+                        <div class="menu-text">Ödeme Yöntemleri</div>
+                    </a>
+                    
+                    <a href="#" class="menu-item">
+                        <div class="menu-icon">📄</div>
+                        <div class="menu-text">Belgelerim</div>
+                    </a>
+                    
+                    <a href="#" class="menu-item">
+                        <div class="menu-icon">❓</div>
+                        <div class="menu-text">Yardım</div>
+                    </a>
+                    
+                    <a href="#" class="menu-item">
+                        <div class="menu-icon">📞</div>
+                        <div class="menu-text">İletişim</div>
+                    </a>
+                </div>
+
+                <button class="btn logout-btn">
+                    Çıkış Yap
+                </button>
+            </div>
+
+            <!-- Bottom Navigation -->
+            <div class="bottom-nav">
+                <div class="nav-items">
+                    <a href="#" class="nav-item">
+                        <div class="nav-icon">🏠</div>
+                        <div>Ana Sayfa</div>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <div class="nav-icon">📊</div>
+                        <div>İşlemlerim</div>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <div class="nav-icon">💳</div>
+                        <div>Ödemeler</div>
+                    </a>
+                    <a href="#" class="nav-item active">
+                        <div class="nav-icon">👤</div>
+                        <div>Profil</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Face ID Modal -->
+        <div id="faceIdModal" class="modal-overlay">
+            <div class="modal-card">
+                <div class="modal-icon">👤</div>
+                <div class="modal-title">Face ID ile Onayla</div>
+                <div class="modal-amount">236,00 ₺</div>
+                
+                <div class="modal-scanning">
+                    <div class="scanning-animation"></div>
+                </div>
+                
+                <a href="#" class="modal-cancel" onclick="hideFaceIdModal()">İptal</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Screen Navigation
+        const screenLinks = document.querySelectorAll('.screen-link');
+        const screens = document.querySelectorAll('.screen');
+
+        screenLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // Remove active class from all
+                screenLinks.forEach(l => l.classList.remove('active'));
+                screens.forEach(s => s.classList.remove('active'));
+                
+                // Add active class to clicked
+                link.classList.add('active');
+                const screenId = link.dataset.screen;
+                document.getElementById(screenId).classList.add('active');
+                
+                // Update bottom nav for home screen
+                updateBottomNav(screenId);
+            });
+        });
+
+        // Update bottom navigation active state
+        function updateBottomNav(screenId) {
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            
+            const activeNavIndex = {
+                'home': 0,
+                'offers': 1,
+                'payment': 2,
+                'profile': 3
+            };
+            
+            if (activeNavIndex[screenId] !== undefined) {
+                navItems[activeNavIndex[screenId]].classList.add('active');
+            }
+        }
+
+        // Bottom navigation
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                const text = item.querySelector('div:last-child').textContent;
+                const screenMap = {
+                    'Ana Sayfa': 'home',
+                    'İşlemlerim': 'offers',
+                    'Ödemeler': 'payment',
+                    'Profil': 'profile'
+                };
+                
+                const screenId = screenMap[text];
+                if (screenId) {
+                    // Update screen navigation
+                    screenLinks.forEach(l => l.classList.remove('active'));
+                    screens.forEach(s => s.classList.remove('active'));
+                    
+                    const targetLink = document.querySelector(`[data-screen="${screenId}"]`);
+                    if (targetLink) {
+                        targetLink.classList.add('active');
+                        document.getElementById(screenId).classList.add('active');
+                    }
+                    
+                    updateBottomNav(screenId);
+                }
+            });
+        });
+
+        // Face ID Modal
+        function showFaceIdModal() {
+            document.getElementById('faceIdModal').classList.add('active');
+            
+            // Simulate Face ID success after 2 seconds
+            setTimeout(() => {
+                hideFaceIdModal();
+                alert('Ödeme başarıyla tamamlandı! 🎉');
+            }, 2000);
+        }
+
+        function hideFaceIdModal() {
+            document.getElementById('faceIdModal').classList.remove('active');
+        }
+
+        // Card selection
+        const cardOptions = document.querySelectorAll('.card-option');
+        cardOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                cardOptions.forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+            });
+        });
+
+        // Tab switching
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+            });
+        });
+
+        // Touch feedback for all clickable elements
+        document.querySelectorAll('.btn, .action-card, .transaction-item, .offer-card, .menu-item').forEach(element => {
+            element.addEventListener('touchstart', () => {
+                element.style.transform = 'scale(0.95)';
+            });
+            
+            element.addEventListener('touchend', () => {
+                setTimeout(() => {
+                    element.style.transform = '';
+                }, 100);
+            });
+        });
+
+        // Hide screen nav on mobile
+        if (window.innerWidth <= 375) {
+            document.querySelector('.screen-nav').style.display = 'none';
+        }
+
+        // Simulate splash screen transition
+        setTimeout(() => {
+            const splashLink = document.querySelector('[data-screen="home"]');
+            if (splashLink && document.getElementById('splash').classList.contains('active')) {
+                splashLink.click();
+            }
+        }, 3000);
+    </script>
+</body>
+</html>
